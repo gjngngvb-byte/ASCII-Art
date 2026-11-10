@@ -20,7 +20,7 @@ function bloom(tt){let u=Math.max(0,Math.min(1,(tt-5.5)/9));return u*(2-u)*.55+u
 function rotate(p,a){let c=Math.cos(a),s=Math.sin(a);return [c*p[0]+s*p[2],p[1],-s*p[0]+c*p[2]]}
 function camera(p){let eye=[0,1.75,4],target=[0,-.05,0],f=target.map((x,i)=>x-eye[i]),fl=Math.hypot(...f);f=f.map(x=>x/fl);let right=[f[2],0,-f[0]],rl=Math.hypot(...right);right=right.map(x=>x/rl);let up=[right[1]*f[2]-right[2]*f[1],right[2]*f[0]-right[0]*f[2],right[0]*f[1]-right[1]*f[0]],r=p.map((x,i)=>x-eye[i]);return [r.reduce((a,x,i)=>a+x*right[i],0),r.reduce((a,x,i)=>a+x*up[i],0),r.reduce((a,x,i)=>a+x*f[i],0)]}
 function render(tt,dt){
- const op=bloom(tt),yaw=.22*Math.sin(Math.max(tt-7,0)*.35)*smooth((tt-7)/4),key=[-.35,.85,.65],kl=Math.hypot(...key);key=key.map(x=>x/kl);
+ const op=bloom(tt),yaw=.22*Math.sin(Math.max(tt-7,0)*.35)*smooth((tt-7)/4);let key=[-.35,.85,.65];const kl=Math.hypot(...key);key=key.map(x=>x/kl);
  const cloud=[];
  // static body base
  for(let i=0;i<pts.length;i++){let p=rotate(pts[i],yaw),n=rotate(norms[i],yaw),o=orders[i],reveal=smooth(((tt-.3)/5.1*1.66-o)/(o>=1?.09:.05));if(reveal<.02)continue;
