@@ -23,7 +23,7 @@ function render(tt,dt){
  const op=bloom(tt),yaw=.22*Math.sin(Math.max(tt-7,0)*.35)*smooth((tt-7)/4);let key=[-.35,.85,.65];const kl=Math.hypot(...key);key=key.map(x=>x/kl);
  const cloud=[];
  // static body base
- for(let i=0;i<pts.length;i++){let p=rotate(pts[i],yaw),n=rotate(norms[i],yaw),o=orders[i],reveal=smooth(((tt-.3)/5.1*1.66-o)/(o>=1?.09:.05));if(reveal<.02)continue;
+ for(let i=0;i<pts.length;i++){let p=rotate(pts[i],yaw),n=rotate(norms[i],yaw),o=orders[i];if(parts[i]===1){const src=pts[i],leafBase=src[1]<-.55?curve(.32):curve(.55),phase=src[1]<-.55?.4:2.1,reach=Math.max(0,Math.min(1,Math.hypot(src[0]-leafBase[0],src[1]-leafBase[1],src[2]-leafBase[2])/.48)),wave=Math.sin(tt*1.65+phase);p[0]+=wave*.055*reach;p[2]+=Math.cos(tt*1.35+phase)*.035*reach;p[1]+=Math.sin(tt*1.1+phase)*.012*reach;}let reveal=smooth(((tt-.3)/5.1*1.66-o)/(o>=1?.09:.05));if(reveal<.02)continue;
  let diff=Math.max(0,n[0]*key[0]+n[1]*key[1]+n[2]*key[2]),lum=.62+.6*diff;
  cloud.push({p,lum:lum*reveal,k:parts[i],z:0})}
  // sepals
@@ -38,7 +38,7 @@ function render(tt,dt){
  for(let i=0;i<230;i++){let a=(i*2.39996)+tt*(.05+(i%7)*.012),r=.55+1.6*((i*37%101)/101)**.7,y=-1.1+2.3*((i*61%97)/97)+.05*Math.sin(tt*.6+i);let tw=Math.max(0,Math.sin(tt*(1.2+i%5*.4)+i*1.7))**8;cloud.push({p:[Math.cos(a)*r,y,Math.sin(a)*r*.6-.35],lum:.10+.85*tw,k:5})}
  // Perspective projection with a per-cell z buffer
  const depth=new Float32Array(cols*rows);depth.fill(99);const glyph=new Array(cols*rows).fill(' '),bright=new Float32Array(cols*rows),tag=new Uint8Array(cols*rows);
- for(const o of cloud){let [x,y,z]=camera(o.p);if(z<=.2)continue;let sx=(.5+x/z*1.45)*cols,sy=(.5+y/z*1.45*aspect)*rows,ix=sx|0,iy=sy|0;if(ix<0||ix>=cols||iy<0||iy>=rows)continue;let id=iy*cols+ix;if(z<depth[id]){depth[id]=z;let l=Math.max(0,Math.min(1,o.lum)),pool=pools[Math.min(3,Math.floor(l*4))],seed=(iy*7919+ix*104729+Math.floor(tt*4))%pool.length;glyph[id]=l>.93?'*':pool[seed];bright[id]=l;tag[id]=o.k}}
+ for(const o of cloud){let [x,y,z]=camera(o.p);if(z<=.2)continue;let sx=(.5+x/z*1.45)*cols,sy=(.5-y/z*1.45*aspect)*rows,ix=sx|0,iy=sy|0;if(ix<0||ix>=cols||iy<0||iy>=rows)continue;let id=iy*cols+ix;if(z<depth[id]){depth[id]=z;let l=Math.max(0,Math.min(1,o.lum)),pool=pools[Math.min(3,Math.floor(l*4))],seed=(iy*7919+ix*104729+Math.floor(tt*4))%pool.length;glyph[id]=l>.93?'*':pool[seed];bright[id]=l;tag[id]=o.k}}
  // Render crisp character cells, subtle colored glow
  ctx.fillStyle='#050308';ctx.fillRect(0,0,cv.width,cv.height);ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold '+Math.max(8,Math.floor(ch*.88))+'px ui-monospace,monospace';
  for(let i=0;i<glyph.length;i++){if(glyph[i]===' ')continue;let x=i%cols,y=(i/cols)|0,l=bright[i];ctx.fillStyle=colors[tag[i]]||'#fff';ctx.globalAlpha=.25+l*.75;ctx.fillText(glyph[i],(x+.5)*cw,(y+.5)*ch)}
