@@ -83,7 +83,8 @@ function chooseScene(n){activeScene=n;t=0;last=0;gp.hidden=true;gt.setAttribute(
 gt.addEventListener('click',()=>{gp.hidden=!gp.hidden;gt.setAttribute('aria-expanded',String(!gp.hidden))});
 $('galleryClose').addEventListener('click',()=>chooseScene(0));
 document.querySelectorAll('[data-scene]').forEach(b=>b.addEventListener('click',()=>chooseScene(+b.dataset.scene)));
-\nfunction loop(now){if(!last)last=now;let dt=Math.min((now-last)/1000,.05);last=now;if(!paused){t+=dt;if(t>LOOP)t=0}render(t,dt);raf=requestAnimationFrame(loop)}
+
+function loop(now){if(!last)last=now;let dt=Math.min((now-last)/1000,.05);last=now;if(!paused){t+=dt;if(t>LOOP)t=0}render(t,dt);raf=requestAnimationFrame(loop)}
 $('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'▶ Continuar':'Ⅱ Pausar'};
 $('restart').onclick=()=>{t=0;last=0};
 $('fullscreen').onclick=()=>{if(!document.fullscreenElement)document.getElementById('stage').requestFullscreen?.();else document.exitFullscreen?.()};
