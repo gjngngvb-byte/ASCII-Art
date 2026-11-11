@@ -26,8 +26,15 @@ function render(tt,dt){
  for(let i=0;i<pts.length;i++){let p=rotate(pts[i],yaw),n=rotate(norms[i],yaw),o=orders[i];if(parts[i]===1){const src=pts[i],leafBase=src[1]<-.55?curve(.32):curve(.55),phase=src[1]<-.55?.4:2.1,reach=Math.max(0,Math.min(1,Math.hypot(src[0]-leafBase[0],src[1]-leafBase[1],src[2]-leafBase[2])/.48)),wave=Math.sin(tt*1.65+phase);p[0]+=wave*.055*reach;p[2]+=Math.cos(tt*1.35+phase)*.035*reach;p[1]+=Math.sin(tt*1.1+phase)*.012*reach;}let reveal=smooth(((tt-.3)/5.1*1.66-o)/(o>=1?.09:.05));if(reveal<.02)continue;
  let diff=Math.max(0,n[0]*key[0]+n[1]*key[1]+n[2]*key[2]),lum=.62+.6*diff;
  cloud.push({p,lum:lum*reveal,k:parts[i],z:0})}
- // sepals
- for(let q=0;q<5;q++)for(let i=0;i<34;i++){let s=i/33,beta=1.05+.35*op+(.55+.75*op)*s,L=.36-.06*op,a=TAU*q/5+.3,r=.045+L*s*Math.sin(beta),y=HEAD+.02+L*s*Math.cos(beta),p=[Math.cos(a)*r,y,Math.sin(a)*r];cloud.push({p:rotate(p,yaw),lum:.7,k:2})}
+ // Five sepals: full folded leaf surfaces matching the original Python geometry
+ for(let q=0;q<5;q++)for(let wi=0;wi<9;wi++)for(let si=0;si<34;si++){
+  let s=si/33,w=-1+2*wi/8,beta=(1.05+.35*op)+(.55+.75*op)*s,L=.36-.06*op,a=TAU*q/5+.3;
+  let r=.045+L*s*Math.sin(beta),ang=a+w*.10*Math.pow(1-s,1.3)/Math.max(r/.2,.25);
+  let y=HEAD+.02+L*s*Math.cos(beta),p=[Math.cos(ang)*r,y,Math.sin(ang)*r];
+  let n=[Math.cos(ang)*Math.cos(beta),-Math.sin(beta),Math.sin(ang)*Math.cos(beta)];
+  let reveal=smooth(((tt-.3)/5.1*1.66-(1+.10*s))/.09);
+  if(reveal>.01)cloud.push({p:rotate(p,yaw),lum:(.62+.35*Math.max(0,n[1]))*reveal,k:2});
+ }
  // Rose spiral interpolated from closed bud to bloom
  const stride=2;
  for(let z=0;z<pet.length;z+=stride){let q=pet[z],{th,x,thn,pid}=q,A=1.6+4*op,phi=Math.PI/2*Math.exp(-th/(A*Math.PI)),X=1-.5*Math.pow(1.25*(1-((3.6*th/TAU)%1)*2)**2-.25,2),yy=1.95653*x*x*Math.pow(1.27689*x-1,2)*Math.sin(phi),r=X*(x*Math.sin(phi)+yy*Math.cos(phi)),px=r*Math.sin(th)*.8*(1.05-.05*op),pz=r*Math.cos(th)*.8*(1.05-.05*op),py=X*(x*Math.cos(phi)-yy*Math.sin(phi))*.8*(.84+.16*op)+HEAD;
