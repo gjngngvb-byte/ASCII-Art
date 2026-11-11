@@ -48,7 +48,7 @@ function render(tt,dt){
  for(const o of cloud){let [x,y,z]=camera(o.p);if(z<=.2)continue;let sx=(.5+x/z*1.45)*cols,sy=(.5-y/z*1.45*aspect)*rows,ix=sx|0,iy=sy|0;if(ix<0||ix>=cols||iy<0||iy>=rows)continue;let id=iy*cols+ix;if(z<depth[id]){depth[id]=z;let l=Math.max(0,Math.min(1,o.lum)),pool=pools[Math.min(3,Math.floor(l*4))],seed=(iy*7919+ix*104729+Math.floor(tt*4))%pool.length;glyph[id]=l>.93?'*':pool[seed];bright[id]=l;tag[id]=o.k}}
  // Render crisp character cells, subtle colored glow
  ctx.fillStyle='#050308';ctx.fillRect(0,0,cv.width,cv.height);ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold '+Math.max(8,Math.floor(ch*.88))+'px ui-monospace,monospace';
- for(let i=0;i<glyph.length;i++){if(glyph[i]===' ')continue;let x=i%cols,y=(i/cols)|0,l=bright[i];ctx.fillStyle=colors[tag[i]]||'#fff';ctx.globalAlpha=.25+l*.75;ctx.fillText(glyph[i],(x+.5)*cw,(y+.5)*ch)}
+ let visible=0;for(let i=0;i<glyph.length;i++){if(glyph[i]===' ')continue;visible++;let x=i%cols,y=(i/cols)|0,l=bright[i];ctx.fillStyle=colors[tag[i]]||'#fff';ctx.globalAlpha=.25+l*.75;ctx.fillText(glyph[i],(x+.5)*cw,(y+.5)*ch)}
  ctx.globalAlpha=1;
  $('bloom').textContent='BLOOM '+(op*100).toFixed(1)+'% · SWAY '+((yaw*180/Math.PI+360)%360).toFixed(2)+'°';
  $('count').textContent='LETTERS '+String(visible).padStart(5,'0');$('time').textContent='● '+tt.toFixed(2)+'s';
@@ -58,6 +58,8 @@ function loop(now){if(!last)last=now;let dt=Math.min((now-last)/1000,.05);last=n
 $('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'▶ Continuar':'Ⅱ Pausar'};
 $('restart').onclick=()=>{t=0;last=0};
 $('fullscreen').onclick=()=>{if(!document.fullscreenElement)document.getElementById('stage').requestFullscreen?.();else document.exitFullscreen?.()};
-const detailSlider=$('detail');detailSlider.addEventListener('input',()=>{detail=Number(detailSlider.value);$('detailValue').textContent=detail+'%';resize()});\naddEventListener('resize',resize);addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();$('pause').click()}if(e.key.toLowerCase()==='r')$('restart').click();if(e.key.toLowerCase()==='f')$('fullscreen').click()});
+const detailSlider=$('detail');detailSlider.addEventListener('input',()=>{detail=Number(detailSlider.value);$('detailValue').textContent=detail+'%';resize()});
+const detailToggle=$('detailToggle'),detailPanel=$('detailPanel');detailToggle.addEventListener('click',()=>{const opening=detailPanel.hidden;detailPanel.hidden=!opening;detailToggle.setAttribute('aria-expanded',String(opening))});
+addEventListener('resize',resize);addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();$('pause').click()}if(e.key.toLowerCase()==='r')$('restart').click();if(e.key.toLowerCase()==='f')$('fullscreen').click()});
 resize();raf=requestAnimationFrame(loop);
 })();
